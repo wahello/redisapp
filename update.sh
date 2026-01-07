@@ -12,6 +12,8 @@ echo "--> Getting version numbers"
 
 CURR_VERSION=$(curl -s https://jpadilla.github.io/redisapp/ | grep -o '<div class="current-version">v.*' | grep -o '[0-9]*\.[0-9]*\.[0-9]*-build\.[0-9]*')
 
+echo "CURR_VERSION: ${CURR_VERSION}"
+
 CURR_REDIS=$(echo $CURR_VERSION | grep -o '^[0-9]*\.[0-9]*\.[0-9]*')
 CURR_BUILD=$(echo $CURR_VERSION | grep -o '[0-9]*$')
 
@@ -29,6 +31,7 @@ if [ "$FORCE" != true ] && [ "$CURR_REDIS" == "$VERSION" ]; then
   exit 0
 fi
 
+VERSION=8.4.0
 # =========================== DOWNLOAD =========================================
 # Create download url
 DOWNLOAD_URL="http://download.redis.io/releases/redis-$VERSION.tar.gz"
@@ -90,14 +93,22 @@ echo " -- Clean build folder"
 rm -rf build/
 
 echo " -- Build with defaults"
-xcodebuild
+xcodebuild -project Redis.xcodeproj -scheme Redis CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
+echo "============= 1111 "
+echo `PWD`
+echo "============= 2222 " 
 echo " -- Build completed!"
 
 # =========================== RELEASE ==========================================
 echo '--> Release'
 echo " -- Zip"
 cd build/Release
+
+echo "============= 3333 "
+echo `PWD`
+echo "============= 4444 "
+
 zip -r -y "$CURR_DIR/Redis.zip" Redis.app
 cd ../../
 
