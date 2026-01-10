@@ -29,7 +29,6 @@ fi
 
 # =========================== PREPARE DIRECTORIES ==============================
 VENDOR_DIR="$(pwd)/Vendor/redis"
-APP_REDIS_BIN_DIR="$CURR_DIR/Redis.app/Contents/Resources/Vendor/redis/bin"
 
 echo "--> Cleaning $VENDOR_DIR"
 rm -rf "$VENDOR_DIR"
@@ -57,9 +56,7 @@ echo "--> Moving redis install result to $VENDOR_DIR"
 # =========================== COPY BINARIES INTO APP ============================
 echo "--> Injecting redis binaries into app bundle"
 
-mkdir -p "$APP_REDIS_BIN_DIR"
 mkdir -p $VENDOR_DIR/bin/
-
 
 cp -v "$REDIS_SRC_DIR/src/redis-server"    "$VENDOR_DIR/bin/"
 cp -v "$REDIS_SRC_DIR/src/redis-cli"       "$VENDOR_DIR/bin/"
@@ -108,28 +105,29 @@ echo "--> Build completed"
 # =========================== RELEASE ==========================================
 echo "--> Creating zip"
 
-cd "$BUILD_ROOT/Release"
+pushd "$BUILD_ROOT/Release"
 zip -r -y "$CURR_DIR/Redis.zip" Redis.app
-cd "$CURR_DIR"
+popd
+# cd "$CURR_DIR"
 
-FILE_SIZE=$(du "$CURR_DIR/Redis.zip" | cut -f1)
+# FILE_SIZE=$(du "$CURR_DIR/Redis.zip" | cut -f1)
 
 # =========================== APPCAST ==========================================
-echo "--> Creating AppCast post"
+# echo "--> Creating AppCast post"
 
-rm -rf ./_posts/release
-mkdir -p ./_posts/release
+# rm -rf ./_posts/release
+# mkdir -p ./_posts/release
 
-cat <<EOF > ./_posts/release/$(date +"%Y-%m-%d")-${RELEASE_VERSION}.md
----
-version: $RELEASE_VERSION
-redis_version: $VERSION
-package_url: https://github.com/jpadilla/redisapp/releases/download/$RELEASE_VERSION/Redis.zip
-package_length: $FILE_SIZE
-category: release
----
-- Updates redis to $VERSION
-EOF
+# cat <<EOF > ./_posts/release/$(date +"%Y-%m-%d")-${RELEASE_VERSION}.md
+# ---
+# version: $RELEASE_VERSION
+# redis_version: $VERSION
+# package_url: https://github.com/jpadilla/redisapp/releases/download/$RELEASE_VERSION/Redis.zip
+# package_length: $FILE_SIZE
+# category: release
+# ---
+# - Updates redis to $VERSION
+# EOF
 
 # =========================== DONE =============================================
 echo ""
